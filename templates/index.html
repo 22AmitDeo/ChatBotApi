@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debate Submission</title>
+</head>
+
+<body>
+    <h2>Submit a Debate Topic</h2>
+    <form id="debateForm">
+        <label for="topic">Debate Topic:</label><br>
+        <input type="text" id="topic" name="topic" required><br><br>
+
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="description" required></textarea><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>All Debates</h2>
+    <ul id="debateList"></ul>
+
+    <script>
+        document.getElementById("debateForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            let topic = document.getElementById("topic").value;
+            let description = document.getElementById("description").value;
+
+            fetch("/api/debates/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ topic: topic, description: description })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert("Debate submitted successfully!");
+                    fetchDebates();
+                })
+                .catch(error => console.error("Error:", error));
+        });
+
+        function fetchDebates() {
+            fetch("/api/debates/")
+                .then(response => response.json())
+                .then(data => {
+                    let debateList = document.getElementById("debateList");
+                    debateList.innerHTML = "";
+                    data.forEach(debate => {
+                        let li = document.createElement("li");
+                        li.textContent = `${debate.topic} - ${debate.description}`;
+                        debateList.appendChild(li);
+                    });
+                });
+        }
+
+        fetchDebates();
+    </script>
+</body>
+
+</html>
